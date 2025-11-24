@@ -1,0 +1,67 @@
+/*
+|----------------------------------------------------------------------------
+	Contact Form 7 Popup Alert Message WordPress Addon CSS
+	Author: MGScoder
+	Author URL: https://codecanyon.net/user/mgscoder
+|----------------------------------------------------------------------------
+*/
+.sweet-alert {
+    border-radius: 15px;
+	padding: 15px;
+	max-width: 90%;
+}
+.sweet-alert .sa-icon {
+    margin: 10px auto;
+	overflow: hidden;
+}
+.sweet-alert .sa-icon.sa-success .sa-fix {
+    width: 8px;
+}
+.sweet-alert fieldset {
+    display: none;
+}
+.sweet-alert button {
+    font-size: 18px;
+	line-height: 1.2;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 6px 30px;
+    margin: 20px 5px 10px;
+}
+.sweet-alert h2 {
+    font-size: 38px;
+	margin: 20px 0;
+}
+.sweet-alert h2, .sweet-alert p {
+    font-weight: bold;
+}
+.sweet-alert p {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.sweet-alert .sa-icon.sa-success .sa-fix {
+    left: 27px;
+}
+
+/**********error icon***********/
+.sweet-alert .sa-icon.sa-error {
+    border-color: #ce0606;
+}
+.sweet-alert .sa-icon.sa-error .sa-line {
+    background-color: #ce0606;
+}
+
+/**********success icon***********/
+.sweet-alert .sa-icon.sa-success {
+    border-color: #37a000;
+}
+.sweet-alert .sa-icon.sa-success .sa-line {
+    background-color: #37a000;
+}
+
+/**********font***********/
+.sweet-alert, .sweet-alert button {
+    font-family: inherit;
+}

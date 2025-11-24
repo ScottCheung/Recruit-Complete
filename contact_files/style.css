@@ -1,0 +1,13 @@
+/*
+Theme Name:     Jupiter Child Theme
+Theme URI: 		http://demos.artbees.net/jupiter5
+Description:    Child theme for the Jupiter theme 
+Author:         Your name here
+Theme URI: 		http://themeforest.net/user/artbees
+Template:       jupiter
+Text Domain: mk_framework
+Domain Path: /languages/
+*/
+/*Import Avenir font*/
+@font-face {font-family: avenir-roman;src: url('lib/font/avenir/Avenir-Roman.otf');}
+@font-face {font-family: avenir-black;src: url('lib/font/avenir/AEH.ttf');}
