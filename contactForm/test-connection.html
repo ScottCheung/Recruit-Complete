@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ContactForm Connection Tester</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      display: none;
+    }
+    
+    .result.show {
+      display: block;
+    }
+    
+    .result.success {
+      background: #d4edda;
+      border: 2px solid #28a745;
+      color: #155724;
+    }
+    
+    .result.error {
+      background: #f8d7da;
+      border: 2px solid #dc3545;
+      color: #721c24;
+    }
+    
+    .result h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .result pre {
+      background: rgba(0, 0, 0, 0.05);
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #014361;
+    }
+    
+    .highlight {
+      background: #fff3cd;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 ContactForm Connection Tester</h1>
+    <p class="subtitle">Test Google Apps Script connection and view available sheets</p>
+    
+    <div class="info-box">
+      📌 This tool will send test requests to your Google Apps Script to help diagnose "Sheet not found" errors.
+    </div>
+    
+    <form id="testForm">
+      <div class="input-group">
+        <label for="scriptUrl">
+          Google Apps Script URL
+          <span style="color: #dc3545;">*</span>
+        </label>
+        <input 
+          type="url" 
+          id="scriptUrl" 
+          required
+          placeholder="https://script.google.com/macros/s/..."
+          value="https://script.google.com/macros/s/AKfycbz7tXByaRFEcHmeHJQDIMfmq_uQZqsbkJpTztV7pV5xwuisCMQE_DPFvwcidL5o6F-G/exec"
+        >
+      </div>
+      
+      <div class="input-group">
+        <label for="secret">
+          Shared Secret
+          <span style="color: #dc3545;">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="secret" 
+          required
+          placeholder="7a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1o2p"
+          value="7a8b9c0d-1e2f-3g4h-5i6j-7k8l9m0n1o2p"
+        >
+      </div>
+
+      <hr style="margin: 20px 0; opacity: .4;">
+
+      <div class="input-group">
+        <label>Contact Type</label>
+        <select id="contactType">
+          <option value="Other">Other</option>
+          <option value="User">User</option>
+          <option value="Merchant" selected>Merchant</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label>Category</label>
+        <select id="category">
+          <option value="">Other</option>
+          <option value="Merchant Onboarding">Merchant Onboarding</option>
+          <option value="Technical Issue">Technical Issue</option>
+          <option value="Points Inquiry">Points Inquiry</option>
+          <option value="Collaboration">Collaboration</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="assignedTo">Assigned To</label>
+        <input type="text" id="assignedTo" placeholder="Scott" value="Scott" />
+      </div>
+
+      <div class="input-group">
+        <label>Status</label>
+        <select id="status">
+          <option value="New" selected>New</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Replied">Replied</option>
+          <option value="Closed">Closed</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="internalTag">Internal Tag</label>
+        <input type="text" id="internalTag" placeholder="VIP / Good Merchant" value="VIP" />
+      </div>
+
+      <div class="input-group">
+        <label for="followUpDate">Follow Up Date (YYYY/MM/DD)</label>
+        <input type="text" id="followUpDate" placeholder="2025/01/15" />
+      </div>
+      
+      <button type="submit" class="btn" id="testBtn">
+        🚀 Test Connection
+      </button>
+    </form>
+    
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('testForm');
+    const resultDiv = document.getElementById('result');
+    const testBtn = document.getElementById('testBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const scriptUrl = document.getElementById('scriptUrl').value;
+      const secret = document.getElementById('secret').value;
+      
+      // Reset result
+      resultDiv.className = 'result';
+      resultDiv.style.display = 'none';
+      
+      // Show loading
+      testBtn.disabled = true;
+      testBtn.innerHTML = '<span class="loader"></span>Testing...';
+      
+      try {
+        // Create test data
+        const formData = new FormData();
+        formData.append('name', 'Test User');
+        formData.append('email', 'test@example.com');
+        formData.append('message', 'This is a test message from connection tester');
+        formData.append('source', window.location.href);
+        formData.append('sourcePath', window.location.pathname);
+        formData.append('ua', navigator.userAgent);
+        formData.append('secret', secret);
+
+        // new schema optional fields
+        const contactType = document.getElementById('contactType').value;
+        const category = document.getElementById('category').value;
+        const assignedTo = document.getElementById('assignedTo').value;
+        const status = document.getElementById('status').value;
+        const internalTag = document.getElementById('internalTag').value;
+        const followUpDate = document.getElementById('followUpDate').value;
+
+        if (contactType) formData.append('contactType', contactType);
+        if (category) formData.append('category', category);
+        if (assignedTo) formData.append('assignedTo', assignedTo);
+        if (status) formData.append('status', status);
+        if (internalTag) formData.append('internalTag', internalTag);
+        if (followUpDate) formData.append('followUpDate', followUpDate);
+        
+        console.log('Sending test request to:', scriptUrl);
+        
+        const response = await fetch(scriptUrl, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const result = await response.json();
+        console.log('Response:', result);
+        
+        if (result.success) {
+          showSuccess(result);
+        } else {
+          showError(result);
+        }
+        
+      } catch (error) {
+        showNetworkError(error);
+      } finally {
+        testBtn.disabled = false;
+        testBtn.innerHTML = '🚀 Test Connection';
+      }
+    });
+
+    function showSuccess(result) {
+      resultDiv.className = 'result success show';
+      resultDiv.innerHTML = `
+        <h3>✅ Connection Successful!</h3>
+        <p>Message successfully sent to Google Sheet</p>
+        <pre>${JSON.stringify(result, null, 2)}</pre>
+        <p style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #28a745;">
+          <strong>Next Steps:</strong>
+          <br>Open your Google Sheet to check if new data has been written.
+        </p>
+      `;
+    }
+
+    function showError(result) {
+      resultDiv.className = 'result error show';
+      
+      let errorHtml = `
+        <h3>❌ Connection Failed</h3>
+        <p><strong>Error Message:</strong> ${result.error || 'Unknown error'}</p>
+      `;
+      
+      // If there is debug information, display it
+      if (result.debug) {
+        errorHtml += `
+          <div style="margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 6px;">
+            <strong>🔍 Debug Information:</strong>
+            <br><br>
+            ${result.debug.sheetId ? `<strong>Sheet ID:</strong><br><span class="highlight">${result.debug.sheetId}</span><br><br>` : ''}
+            ${result.debug.requestedSheetName ? `<strong>Requested Sheet Name:</strong><br><span class="highlight">${result.debug.requestedSheetName}</span><br><br>` : ''}
+            ${result.debug.availableSheets ? `
+              <strong>Available Sheet List:</strong>
+              <ul style="margin: 10px 0; padding-left: 20px;">
+                ${result.debug.availableSheets.map(sheet => `<li><span class="highlight">${sheet}</span></li>`).join('')}
+              </ul>
+              <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 4px; border-left: 3px solid #ffc107;">
+                <strong>💡 Solution:</strong><br>
+                1. Rename the sheet in Google Sheet to: <span class="highlight">${result.debug.requestedSheetName}</span><br>
+                or<br>
+                2. Modify SHEET_NAME in GoogleAppsScript.gs to one of the sheet names listed above
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      errorHtml += `
+        <pre style="margin-top: 15px;">${JSON.stringify(result, null, 2)}</pre>
+      `;
+      
+      resultDiv.innerHTML = errorHtml;
+    }
+
+    function showNetworkError(error) {
+      resultDiv.className = 'result error show';
+      resultDiv.innerHTML = `
+        <h3>❌ Network Error</h3>
+        <p>Unable to connect to Google Apps Script</p>
+        <pre>${error.message}</pre>
+        <div style="margin-top: 15px; padding: 12px; background: #fff3cd; border-radius: 4px;">
+          <strong>Possible Causes:</strong>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>Apps Script URL is incorrect</li>
+            <li>Apps Script is not properly deployed</li>
+            <li>Network connection issue</li>
+            <li>CORS settings issue</li>
+          </ul>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
+
